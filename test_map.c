@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "dyn_arr.h"
 #include "str.h"
 #include "map.h"
+#include "wrapper.h"
 #include "minunit.h"
 
 //char * test_map_count();
@@ -95,8 +97,8 @@ char * test_map_count_words()
 {
     size_t i;
     char * file_contents = str_create();
-    FILE * fp = fopen("data/hello.txt", "r");
-    mu_assert_old("cannot open file", fp != NULL);
+    const char fn[] = "data/hello.txt";
+    FILE * fp = Fopen(fn, "r");
     while (fgets(buffer, BUFFER_LEN, fp) != NULL)
         str_concat(file_contents, buffer);
     fclose(fp);

@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include "str.h"
 #include "dyn_arr.h"
+#include "wrapper.h"
 
 // TODO: require cap of at least 1
 char * str_create_prealloc(size_t cap)

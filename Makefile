@@ -14,12 +14,11 @@ SRC = main.c \
 	  list.c \
 	  dyn_arr.c \
 	  str.c \
-	  map.c
+	  map.c \
+	  wrapper.c
 OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
 DEP = $(OBJ:%.o=%.d)
 
-# unify tests into single build target
-#TEST_SRC = test_list.c
 TEST_SRC = test.c \
 		   list.c \
 		   test_list.c \
@@ -28,11 +27,11 @@ TEST_SRC = test.c \
 		   str.c \
 		   test_str.c \
 		   map.c \
-		   test_map.c
+		   test_map.c \
+		   wrapper.c
 TEST_OBJ = $(TEST_SRC:%.c=$(BUILD_DIR)/%.o)
 TEST_DEP = $(TEST_OBJ:%.o=%.d)
 
-#all: $(TARGET)
 all: release
 
 debug: CFLAGS += -DDEBUG -g
