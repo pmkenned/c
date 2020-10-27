@@ -11,6 +11,9 @@
 //char * test_map_count();
 //char * test_map_count_words();
 
+#define BUFFER_LEN 1024
+static char buffer[BUFFER_LEN];
+
 char * test_map_count()
 {
     map_t * map = map_create(int);
@@ -46,10 +49,10 @@ char * test_map_count()
     //if (map_get(map, "kumquat", &x)) { printf("kumquat: %d\n", x); }
 
     int * x_p;
-    printf("\n");
-    if ((x_p = map_get_ptr(map, "peach"))) { printf("peach: %d\n", *x_p); }
-    if ((x_p = map_get_ptr(map, "kumquat"))) { printf("kumquat: %d\n", *x_p); }
-    printf("\n");
+    x_p = map_get_ptr(map, "peach");
+    mu_assert(x_p != NULL, "%s", "peach should be in map but isn't");
+    x_p = map_get_ptr(map, "kumquat");
+    mu_assert(x_p == NULL, "%s", "kumquat  should not be in map but is");
 
     //printf("apple: %d\n", map_get(map, "apple", int));
     //printf("banana: %d\n", map_get(map, "banana", int));
@@ -63,7 +66,7 @@ char * test_map_count()
     //printf("pear: %d\n", map_get(map, "pear", int));
     //printf("peach: %d\n", map_get(map, "peach", int));
 
-    map_print(map);
+    //map_print(map);
 
     map_destroy(map);
 
@@ -93,6 +96,7 @@ char * test_map_count()
 //    return 0;
 //}
 
+// TODO: use mu_assert
 char * test_map_count_words()
 {
     size_t i;
@@ -117,9 +121,9 @@ char * test_map_count_words()
             (*count)++;
     }
 
-    printf("\n");
-    map_print(map);
-    printf("\n");
+    //printf("\n");
+    //map_print(map);
+    //printf("\n");
 
     for (i=0; i<dyn_arr_length(tokens); i++)
         str_destroy(tokens[i]);
@@ -130,10 +134,33 @@ char * test_map_count_words()
     return 0;
 }
 
+char * test_map_map()
+{
+    map_t * map_l1 = map_create(map_t *);
+
+    map_t * map_ny = map_create(int);
+    map_set_rvalue(map_ny, "Albany", 97000);
+    map_set_rvalue(map_ny, "New York City", 8300000);
+
+    map_t * map_me = map_create(int);
+    map_set_rvalue(map_me, "Bangor", 33000);
+    map_set_rvalue(map_me, "Augusta", 19000);
+
+    map_set(map_l1, "New York", map_ny);
+    map_set(map_l1, "Maine",    map_me);
+
+    //map_print_l2(map_l1);
+
+    map_destroy(map_l1);
+
+    return 0;
+}
+
 char * map_tests()
 {
     mu_run_test(test_map_count);
     mu_run_test(test_map_count_words);
+    mu_run_test(test_map_map);
     return 0;
 }
 

@@ -28,6 +28,8 @@ TEST_SRC = test.c \
 		   test_str.c \
 		   map.c \
 		   test_map.c \
+		   map2.c \
+		   test_map2.c \
 		   wrapper.c
 TEST_OBJ = $(TEST_SRC:%.c=$(BUILD_DIR)/%.o)
 TEST_DEP = $(TEST_OBJ:%.o=%.d)

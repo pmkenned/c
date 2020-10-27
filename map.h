@@ -20,6 +20,7 @@ void _map_set(map_t * map, const char * key, const void * value);
 
 //void map_print_keys(const map_t * map);
 void map_print(const map_t * map);
+void map_print_l2(const map_t * map);
 
 #define map_create(value_type)                  _map_create(sizeof(value_type), MAP_INIT_CAP)
 #define map_create_prealloc(value_type, cap)    _map_create(sizeof(value_type), cap)

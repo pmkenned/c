@@ -12,6 +12,9 @@
 //char * test_str_tokenize();
 //char * test_str_tokenize_file();
 
+#define BUFFER_LEN 1024
+static char buffer[BUFFER_LEN];
+
 char * test_str()
 {
     const char target_str[] = "hello, world!";
@@ -66,7 +69,7 @@ char * test_str_tokenize()
 char * test_str_tokenize_file()
 {
     size_t i;
-    FILE * fp = Fopen("data/hello2.txt", "r");
+    FILE * fp = Fopen("data/hello.txt", "r");
     char * file_contents = str_create();
     while (fgets(buffer, BUFFER_LEN, fp) != NULL)
         str_concat(file_contents, buffer);

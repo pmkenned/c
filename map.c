@@ -4,6 +4,8 @@
 #include "str.h"
 #include "map.h"
 
+// TODO: add typedef for str for clarity
+
 struct map_t {
     size_t value_size;
     size_t cap;
@@ -17,6 +19,7 @@ map_t * _map_create(size_t value_size, size_t cap)
     map_t * map = malloc(sizeof(*map));
     map->value_size = value_size;
     map->cap = cap;
+    // NOTE: keys doesn't have to be a dynamic array
     map->keys = dyn_arr_create_prealloc(char *, cap);
     for (i=0; i<cap; i++)
         dyn_arr_append_rval(map->keys, str_create());
@@ -142,13 +145,51 @@ void _map_set(map_t * map, const char * key, const void * value)
 //    }
 //}
 
+// TODO: allow specifying format string or something
+void map_print_ptr(const map_t * map)
+{
+    size_t i;
+    for (i=0; i<dyn_arr_length(map->keys); i++) {
+        if (str_length(map->keys[i]) > 0) {
+            void * value = *((void **)((char *)(map->values) + i*map->value_size));
+            printf("%s: %p\n", map->keys[i], value);
+        }
+    }
+}
+
 void map_print(const map_t * map)
 {
     size_t i;
     for (i=0; i<dyn_arr_length(map->keys); i++) {
         if (str_length(map->keys[i]) > 0) {
-            int value = *((char *)(map->values) + i*map->value_size);
+            int value = *((int *)((char *)(map->values) + i*map->value_size));
             printf("%s: %d\n", map->keys[i], value);
+        }
+    }
+}
+
+void _map_print_depth(const map_t * map, int depth)
+{
+    size_t i;
+    int j;
+    for (i=0; i<dyn_arr_length(map->keys); i++) {
+        if (str_length(map->keys[i]) > 0) {
+            int value = *((int *)((char *)(map->values) + i*map->value_size));
+            for (j=0; j<depth; j++)
+                printf("  ");
+            printf("%s: %d\n", map->keys[i], value);
+        }
+    }
+}
+
+void map_print_l2(const map_t * map)
+{
+    size_t i;
+    for (i=0; i<dyn_arr_length(map->keys); i++) {
+        if (str_length(map->keys[i]) > 0) {
+            map_t * value = *((void **)((char *)(map->values) + i*map->value_size));
+            printf("%s:\n", map->keys[i]);
+            _map_print_depth(value, 1);
         }
     }
 }
