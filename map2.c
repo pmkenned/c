@@ -3,6 +3,25 @@
 #include <string.h>
 #include "map2.h"
 
+const size_t type_sizes[TYPE_COUNT] = {
+    sizeof(short),              // TYPE_SHORT
+    sizeof(unsigned short),     // TYPE_USHORT
+    sizeof(int),                // TYPE_INT
+    sizeof(unsigned int),       // TYPE_UINT
+    sizeof(long),               // TYPE_LONG
+    sizeof(unsigned long),      // TYPE_ULONG,
+    sizeof(char),               // TYPE_CHAR,
+    sizeof(unsigned char),      // TYPE_UCHAR,
+    sizeof(signed char),        // TYPE_SCHAR,
+    sizeof(float),              // TYPE_FLOAT,
+    sizeof(double),             // TYPE_DOUBLE,
+    sizeof(char *),             // TYPE_C_STR,
+    sizeof(void *),             // TYPE_PTR,
+    0,                          // TYPE_DYN_ARR,
+    0,                          // TYPE_MAP,
+    0                           // TYPE_LIST,
+};
+
 struct map2_t {
     size_t value_size;
     size_t cap;
@@ -137,6 +156,7 @@ typedef struct {
 //    return map;
 //}
 
+// TODO: consider using type_size(type) to do ptr arith instead of switch
 map2b_t * _map2b_create(type_t type, size_t cap)
 {
     map2b_t * map;
