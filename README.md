@@ -1,6 +1,27 @@
 # c
 Practicing C
 
+TODO:
+
+* Data structures
+    * doubly linked list
+    * dynamic array
+    * strings
+    * hashmap
+    * graph
+    * tree
+* Network code
+* write documentation
+* malloc debug
+
+Tools to learn:
+
+* make
+* git
+* valgrind
+* splint
+* makeprg (vim)
+
 ```
 src/
   main.c

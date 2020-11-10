@@ -1,5 +1,4 @@
 # TODO: make either debug or release default, put them in separate directories? use strip?
-# TODO: add performance testing
 # TODO: make install
 # TODO: static library build target
 # TODO: flag for which libraries to link (e.g. -lm)
@@ -11,6 +10,7 @@ TARGET=myprog
 BUILD_DIR=./build
 
 SRC = main.c \
+      parse_options.c \
 	  list.c \
 	  dyn_arr.c \
 	  str.c \
@@ -65,6 +65,11 @@ $(BUILD_DIR)/test: $(TEST_OBJ)
 $(BUILD_DIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -MMD -c $< -o $@
+
+.PHONY: perf
+
+perf: release
+	./do_n.sh $(BUILD_DIR)/$(TARGET) 10
 
 static: $(BUILD_DIR)/list.a
 

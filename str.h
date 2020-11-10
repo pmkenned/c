@@ -1,6 +1,9 @@
 #ifndef STR_H
 #define STR_H
 
+// TODO: create string from sprintf
+// TODO: char n times
+
 #define STR_INIT_CAP 16
 
 enum {

@@ -1,122 +1,57 @@
+#include <stddef.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <getopt.h>
 #include <assert.h>
-#include "list.h"
+#include "parse_options.h"
 
-// TODO:
-// * Data structures
-//     * doubly linked list
-//     * dynamic array
-//     * strings
-//     * hashmap
-//     * graph
-//     * tree
-// * Network code
+static int help_flag = 0;
+static int verbose = 0;
+static char * out_file = NULL;
+static char * foo_arg  = NULL;
+static int    n        = 0;
 
-// TODO:
-// * write documentation
-// * malloc debug
+static char * program_name;
+static char * options_str;
+ 
+static void
+usage(int exit_code)
+{
+    fprintf(stderr, "usage: %s [OPTION]... [FILE]...\n", program_name);
+    fprintf(stderr, "%s", options_str);
+    exit(exit_code);
+}
 
-// Tools to learn:
-// * make
-// * git
-// * valgrind
-// * splint
-// * makeprg (vim)
+int
+main(int argc, char ** argv)
+{
+    size_t i;
+    program_name = argv[0];
 
-int verbose = 0;
+    struct my_option my_options[] = {
+        {"help",    'h', "show this help",          ARG_NONE, ARG_TYPE_FLAG, &help_flag},
+        {"verbose", 'v', "verbose mode",            ARG_NONE, ARG_TYPE_FLAG, &verbose  },
+        {"output",  'o', "specify output file",     ARG_MAN,  ARG_TYPE_STR,  &out_file },
+        {"foobar",  'f', "wacky option",            ARG_OPT,  ARG_TYPE_STR,  &foo_arg  },
+        {"number",  'n', "how many times",          ARG_MAN,  ARG_TYPE_INT,  &n        },
+    };
 
-int main(int argc, char ** argv) {
+    const size_t num_options = sizeof(my_options)/sizeof(my_options[0]);
 
-    int c;
-    int digit_optind = 0;
+    options_str = gen_options_str(my_options, num_options);
 
-    while (1) {
-        int this_option_optind = optind ? optind : 1;
-        int option_index = 0;
-        static struct option long_options[] = {
-            {"add",     required_argument, NULL,        0 },
-            {"append",  no_argument,       NULL,        0 },
-            {"delete",  required_argument, NULL,        0 },
-            {"verbose", no_argument,       &verbose,    1 },
-            {"create",  required_argument, NULL,        'c'},
-            {"file",    required_argument, NULL,        0 },
-            {0,         0,                 NULL,        0 }
-        };
+    char ** non_option_args;
+    int num_non_option_args;
 
-        c = getopt_long(argc, argv, "abc:d:012", long_options, &option_index);
-        if (c == -1)
-            break;
+    if (parse_options(argc, argv, my_options, num_options, &non_option_args, &num_non_option_args))
+        usage(EXIT_FAILURE);
 
-        switch (c) {
-        case 0:
-            printf("option %s", long_options[option_index].name);
-            if (optarg)
-                printf(" with arg %s", optarg);
-            printf("\n");
-            break;
+    for (i = 0; i < num_non_option_args; i++)
+        printf("%s\n", non_option_args[i]);
 
-        case '0':
-        case '1':
-        case '2':
-            if (digit_optind != 0 && digit_optind != this_option_optind)
-                printf("digits occur in two different argv-elements.\n");
-            digit_optind = this_option_optind;
-            printf("option %c\n", c);
-            break;
+    if (help_flag)
+        usage(EXIT_SUCCESS);
 
-        case 'a':
-            printf("option a\n");
-            break;
-
-        case 'b':
-            printf("option b\n");
-            break;
-
-        case 'c':
-            printf("option c with value '%s'\n", optarg);
-            break;
-
-        case 'd':
-            printf("option d with value '%s'\n", optarg);
-            break;
-
-        case '?':
-            break;
-
-        default:
-            printf("?? getopt returned character code 0%o ??\n", c);
-        }
-    }
-
-
-    if (verbose) {
-        printf("verbose\n");
-    }
-
-    if (optind < argc) {
-        printf("non-option ARGV-elements: ");
-        while (optind < argc)
-            printf("%s ", argv[optind++]);
-        printf("\n");
-    }
-
-    list_t new_list = list_create();
-    list_t * new_list_ptr = &new_list;
-
-    list_append(new_list_ptr, (node_data_t) 1);
-
-    node_data_t n0 = list_get(new_list_ptr, 0);
-
-    printf("list[0]: %d\n", n0.i);
-
-    assert(1==0);
-
-#ifdef DEBUG
-    printf("debug\n");
-#else
-    printf("no debug\n");
-#endif
+    printf("n: %d\n", n);
 
     return 0;
 }
