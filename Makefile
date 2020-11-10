@@ -10,7 +10,7 @@ TARGET=myprog
 BUILD_DIR=./build
 
 SRC = main.c \
-      parse_options.c \
+	  parse_options.c \
 	  list.c \
 	  dyn_arr.c \
 	  str.c \
