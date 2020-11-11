@@ -2,11 +2,11 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
 int
-parse_options(int argc, char * argv[], struct my_option * options, size_t num_options, char *** non_option_args, int * num_non_option_args)
+parse_options(int argc, char * argv[], option_t * options, size_t num_options, char *** non_option_args, size_t * num_non_option_args)
 {
     size_t i, j;
     char * opt;
@@ -15,7 +15,7 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
     *num_non_option_args = 0;
     *non_option_args = malloc(sizeof(**non_option_args)*argc);
 
-    // initialize flags to 0
+    /* initialize flags to 0 */
     for (i = 0; i < num_options; i++) {
         assert(options[i].optarg != NULL);
         assert((options[i].has_arg == ARG_NONE) == (options[i].arg_type == ARG_TYPE_FLAG));
@@ -24,7 +24,7 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
             *((int *) options[i].optarg) = 0;
     }
 
-    for (i = 1; i < argc; i++) {
+    for (i = 1; i < (size_t) argc; i++) {
         char * curr_arg = argv[i];
         int is_short = 0, is_long = 0, is_single = 0;
         if ((curr_arg[0] == '-') && (curr_arg[1] != '\0')) {
@@ -43,6 +43,8 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
         }
 
         do {
+            int no_option_arg_present = (i == (size_t) argc-1) || (argv[i+1][0] == '-');
+            /* find which option matches */
             for (j = 0; j < num_options; j++) {
                 if ((is_long && (strcmp(opt, options[j].long_opt) == 0)) || 
                     (is_short && (opt[0] == options[j].short_opt)))
@@ -58,13 +60,13 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
                 *((int *) options[j].optarg) = 1;
 
             if (options[j].has_arg == ARG_MAN) {
-                if ((i == argc-1) || (argv[i+1][0] == '-')) {
+                if (no_option_arg_present) {
                     if (is_long)  fprintf(stderr, "%s: option '--%s' has mandatory argument\n", program_name, opt);
                     if (is_short)  fprintf(stderr, "%s: option '-%c' has mandatory argument\n", program_name, opt[0]);
                     return -1;
                 }
             } else if (options[j].has_arg == ARG_OPT) {
-                if ((i == argc-1) ||  (argv[i+1][0] == '-'))
+                if (no_option_arg_present)
                     continue;
             }
             if (options[j].has_arg == ARG_MAN || options[j].has_arg == ARG_OPT) {
@@ -74,7 +76,7 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
                 }
                 if (options[j].arg_type == ARG_TYPE_STR)      *((char **) options[j].optarg) = argv[i+1];
                 else if (options[j].arg_type == ARG_TYPE_INT) *((int *) options[j].optarg) = atoi(argv[i+1]);
-                i++; // skip next argument (used as option argument)
+                i++; /* skip next argument (used as option argument) */
             }
         } while (is_short && ((++opt)[0] != '\0'));
     }
@@ -83,27 +85,31 @@ parse_options(int argc, char * argv[], struct my_option * options, size_t num_op
 
 enum { OPTIONS_PADDING = 20 };
 
-// TODO: clean this up
+/* TODO: clean this up */
 char *
-gen_options_str(struct my_option * options, size_t num_options)
+gen_options_str(option_t * options, size_t num_options)
 {
     size_t i, j;
     size_t cap = 1;
+    char * s, * s_end;
     for (i = 0; i < num_options; i++)
         cap += OPTIONS_PADDING + strlen(options[i].description) + 1;
-    char * s = malloc(sizeof(*s)*cap);
-    char * s_end = s;
+    s = malloc(sizeof(*s)*cap);
+    s_end = s;
     for (i = 0; i < num_options; i++) {
+        int n;
+        char sdash = (options[i].short_opt != ' ') ? '-' : ' ';
+        char * ldash = (options[i].long_opt[0] != '\0') ? "--" : "  ";
         char * arg = "";
         if (options[i].has_arg == ARG_MAN)      arg = "ARG";
         else if (options[i].has_arg == ARG_OPT) arg = "[ARG]";
-        int n = snprintf(s_end, cap - (s_end - s), "-%c --%s %s", options[i].short_opt, options[i].long_opt, arg);
+        n = sprintf(s_end, "%c%c %s%s %s", sdash, options[i].short_opt, ldash, options[i].long_opt, arg);
         s_end += n;
-        // align description
-        for (j = 0; j < (OPTIONS_PADDING - n); j++)
+        /* align description */
+        for (j = 0; j < (size_t) (OPTIONS_PADDING - n); j++)
             (s_end++)[0] = ' ';
         s_end[0] = '\0';
-        n = snprintf(s_end, cap - (s_end - s), "%s\n", options[i].description);
+        n = sprintf(s_end, "%s\n", options[i].description);
         s_end += n;
     }
     return s;

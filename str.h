@@ -1,8 +1,12 @@
 #ifndef STR_H
 #define STR_H
 
-// TODO: create string from sprintf
-// TODO: char n times
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* TODO: create string from sprintf */
+/* TODO: char n times */
 
 #define STR_INIT_CAP 16
 
@@ -38,5 +42,9 @@ void str_tolower(char * s);
 #define str_length(arr) _str_field_get(arr, STR_LENGTH)
 
 void str_destroy(char * s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* STR_H */

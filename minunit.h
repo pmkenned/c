@@ -4,10 +4,11 @@
 #define ERR_MSG_LEN 1024
 extern char err_msg[ERR_MSG_LEN];
 
+/*            snprintf(err_msg, ERR_MSG_LEN, __FILE__ "#%d: " fmt, __LINE__, __VA_ARGS__); \ */
 #define mu_assert(test, fmt, ...) \
     do { \
         if (!(test)) { \
-            snprintf(err_msg, ERR_MSG_LEN, __FILE__ "#%d: " fmt, __LINE__, __VA_ARGS__); \
+            sprintf(err_msg, __FILE__ "#%d: " fmt, __LINE__, __VA_ARGS__); \
             return err_msg; \
         } \
     } while (0)

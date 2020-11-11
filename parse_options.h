@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
     ARG_NONE = 0,
     ARG_OPT,
@@ -16,16 +20,20 @@ typedef enum {
     ARG_TYPE_FLAG
 } arg_type_t;
 
-struct my_option {
+typedef struct {
     const char *    long_opt;
     char            short_opt;
     const char *    description;
     int             has_arg;
     arg_type_t      arg_type;
     void *          optarg;
-};
+} option_t;
 
-int     parse_options(int argc, char * argv[], struct my_option * options, size_t num_options, char *** non_option_args, int * num_non_option_args);
-char *  gen_options_str(struct my_option * options, size_t num_options);
+int     parse_options(int argc, char * argv[], option_t * options, size_t num_options, char *** non_option_args, size_t * num_non_option_args);
+char *  gen_options_str(option_t * options, size_t num_options);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PARSE_OPTIONS_H */

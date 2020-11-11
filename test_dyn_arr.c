@@ -6,10 +6,12 @@
 #include "map.h"
 #include "minunit.h"
 
-//char * test_empty_dyn_arr();
-//char * test_dyn_arr_append();
-//char * test_dyn_arr_append_rval();
-//char * test_dyn_arr_struct();
+#if 0
+char * test_empty_dyn_arr();
+char * test_dyn_arr_append();
+char * test_dyn_arr_append_rval();
+char * test_dyn_arr_struct();
+#endif
 
 typedef struct {
     int x;
@@ -19,26 +21,26 @@ typedef struct {
 char * test_empty_dyn_arr() {
     int * arr = dyn_arr_create(int);
     size_t len = dyn_arr_length(arr);
-    mu_assert(len == 0, "empty dynamic array should have length of 0, not %zu", len);
+    mu_assert(len == 0, "empty dynamic array should have length of 0, not %lu", (unsigned long)  len);
     dyn_arr_destroy(arr);
     return 0;
 }
 
 char * test_dyn_arr_append() {
     size_t N = 20;
-    size_t i;
+    size_t i, len;
     size_t * arr = dyn_arr_create(size_t);
 
     for (i=0; i<N; i++) {
         dyn_arr_append(arr, i);
     }
 
-    size_t len = dyn_arr_length(arr);
-    mu_assert(len == N, "empty dynamic array should have length of %zu, not %zu", N, len);
+    len = dyn_arr_length(arr);
+    mu_assert(len == N, "empty dynamic array should have length of %lu, not %lu", (unsigned long) N, (unsigned long) len);
 
     for (i=0; i<N; i++) {
         size_t x_read = arr[i];
-        mu_assert(x_read == i, "value should be %zu, not %zu", i, x_read);
+        mu_assert(x_read == i, "value should be %lu, not %lu", (unsigned long) i, (unsigned long) x_read);
     }
 
     dyn_arr_destroy(arr);
@@ -62,11 +64,13 @@ char * test_dyn_arr_append_rval() {
 char * test_dyn_arr_struct() {
     my_t * arr = dyn_arr_create(my_t);
 
-    my_t a = {.x = 5, .y = 2};
+    /* my_t a = {.x = 5, .y = 2}; */
+    my_t a = {5, 2};
+    my_t b;
 
     dyn_arr_append(arr, a);
 
-    my_t b = arr[0];
+    b = arr[0];
     mu_assert(b.x == 5, "b.x != %d", 5);
     mu_assert(b.y == 2, "b.y != %d", 2);
 

@@ -20,7 +20,7 @@ void map2_print_str(map2_t * map);
 
 /* type b */
 
-// TODO: consider: bool, long long, size_t, ptrdiff_t, function pointers
+/* TODO: consider: bool, long long, size_t, ptrdiff_t, function pointers */
 typedef enum {
     TYPE_SHORT,
     TYPE_USHORT,
@@ -41,12 +41,14 @@ typedef enum {
     TYPE_COUNT
 } type_t;
 
-//// TODO
-//enum {
-//    TYPE_SHORT_SIZE = sizeof(short),
-//    TYPE_USHORT_SIZE = sizeof(unsigned short),
-//    TYPE_INT = sizeof(int)
-//};
+#if 0
+/* TODO */
+enum {
+    TYPE_SHORT_SIZE = sizeof(short),
+    TYPE_USHORT_SIZE = sizeof(unsigned short),
+    TYPE_INT = sizeof(int)
+};
+#endif
 
 extern const size_t type_sizes[TYPE_COUNT];
 

@@ -1,13 +1,17 @@
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h> /* for exit() */
+#include <stdio.h> /* for fprintf() */
+#include <assert.h>
 #include "dyn_arr.h"
 #include "str.h"
 #include "map.h"
 
-// TODO: add typedef for str for clarity
+/* TODO: add typedef for str for clarity */
 
 struct map_t {
     size_t value_size;
+    size_t n_entries;
     size_t cap;
     char ** keys;
     void * values;
@@ -19,11 +23,12 @@ map_t * _map_create(size_t value_size, size_t cap)
     map_t * map = malloc(sizeof(*map));
     map->value_size = value_size;
     map->cap = cap;
-    // NOTE: keys doesn't have to be a dynamic array
+    map->n_entries = 0;
+    /* NOTE: keys doesn't have to be a dynamic array */
     map->keys = dyn_arr_create_prealloc(char *, cap);
     for (i=0; i<cap; i++)
         dyn_arr_append_rval(map->keys, str_create());
-    //map->values = malloc(value_size*cap);
+    /*map->values = malloc(value_size*cap); */
     map->values = calloc(cap, value_size);
     return map;
 }
@@ -52,8 +57,8 @@ size_t _map_index(const map_t * map, const char * key, int * found, int * open)
     int checked_all = 0;
     int _found = 0, _open = 0;
     size_t idx = _map_hash(key) % map->cap;
-    int init_idx = idx;
-    // TODO: replace strcmp with faster comparison function
+    size_t init_idx = idx;
+    /* TODO: replace strcmp with faster comparison function */
     while ( !(_open = (str_length(map->keys[idx]) == 0)) &&
             !(_found = (strcmp(map->keys[idx], key) == 0)) &&
             !checked_all) {
@@ -74,13 +79,14 @@ void _map_resize(map_t * map)
     map_t * new_map = _map_create(map->value_size, new_cap);
 
     for (i=0; i < dyn_arr_length(map->keys); i++) {
+        const void * value;
         if (str_length(map->keys[i]) == 0)
             continue;
-        const void * value = (char *)(map->values) + i*(map->value_size);
+        value = (char *)(map->values) + i*(map->value_size);
         _map_set(new_map, map->keys[i], value);
     }
 
-    // destroy old map
+    /* destroy old map */
     free(map->values);
     for (i=0; i<dyn_arr_length(map->keys); i++)
         str_destroy(map->keys[i]);
@@ -91,15 +97,17 @@ void _map_resize(map_t * map)
     map->cap = new_cap;
 
     free(new_map);
-    //return new_map;
+    /*return new_map; */
 }
 
-//void * _map_get(const map_t * map, const char * key)
-//{
-//    int open = 0, found = 0;
-//    size_t idx = _map_index(map, key, &found, &open);
-//    return (char *)(map->values) + idx*(map->value_size);
-//}
+#if 0
+void * _map_get(const map_t * map, const char * key)
+{
+    int open = 0, found = 0;
+    size_t idx = _map_index(map, key, &found, &open);
+    return (char *)(map->values) + idx*(map->value_size);
+}
+#endif
 
 int _map_get(const map_t * map, const char * key, void * dest)
 {
@@ -125,27 +133,33 @@ void _map_set(map_t * map, const char * key, const void * value)
     int open = 0, found = 0;
     size_t idx = _map_index(map, key, &found, &open);
 
+    assert(open || found);
+
     if (open)
         str_copy(map->keys[idx], key);
 
     if (open || found) {
         size_t value_size = map->value_size;
         memcpy((char *)(map->values) + idx*value_size, value, value_size);
-    } else {
-        _map_resize(map);
-        _map_set(map, key, value);
+        if (!found) {
+            map->n_entries++;
+            if (1.0*map->n_entries/map->cap > 0.9)
+                _map_resize(map);
+        }
     }
 }
 
-//void map_print_keys(const map_t * map)
-//{
-//    size_t i;
-//    for (i=0; i<dyn_arr_length(map->keys); i++) {
-//        printf("%s\n", map->keys[i]);
-//    }
-//}
+#if 0
+void map_print_keys(const map_t * map)
+{
+    size_t i;
+    for (i=0; i<dyn_arr_length(map->keys); i++) {
+        printf("%s\n", map->keys[i]);
+    }
+}
+#endif
 
-// TODO: allow specifying format string or something
+/* TODO: allow specifying format string or something */
 void map_print_ptr(const map_t * map)
 {
     size_t i;

@@ -1,12 +1,16 @@
 #ifndef LIST_H
 #define LIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int list_error;
 
 #define LIST_ERR_INVALID_INDEX 1
 #define LIST_ERR_NULL_LIST_PTR 2
 
-// NOTE: a list of chars is 4 (or 8) bytes each...
+/* NOTE: a list of chars is 4 (or 8) bytes each... */
 typedef union {
     void * ptr;
     short s;
@@ -19,16 +23,17 @@ typedef union {
     float f;
 } node_data_t;
 
-// TODO: add field identifying data type
-// TODO: make this opaque?
+/* TODO: add field identifying data type */
+/* TODO: make this opaque? */
 typedef struct list_node {
     node_data_t data;
     struct list_node * next;
 } list_node_t;
 
-// TODO: consider this way of separating interface from impl:
-// struct list_t;
-// typedef struct list_t * list_t;
+/* TODO: consider this way of separating interface from impl:
+ * struct list_t;
+ * typedef struct list_t * list_t;
+ */
 
 typedef struct {
     list_node_t * head;
@@ -44,5 +49,9 @@ void        list_destroy(list_t * list);
 size_t      list_length(const list_t * list);
 list_t      list_dup(const list_t * src);
 char *      list_to_str(const list_t * list);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

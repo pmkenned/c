@@ -4,7 +4,7 @@
 
 char * test_map2()
 {
-    //map2_t * map = map2_create(char *);
+    /*map2_t * map = map2_create(char *); */
     map2b_t * map = map2b_create(TYPE_C_STR);
 
     map2b_set(map, "New York", "Albany");

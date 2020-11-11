@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "dyn_arr.h"
 
-// TODO: think carefully about alignment requirements
+/* TODO: think carefully about alignment requirements */
 void * _dyn_arr_create(size_t init_cap, size_t stride)
 {
     size_t header_size = DYN_ARR_FIELDS * sizeof(size_t);
@@ -38,7 +38,7 @@ void * _dyn_arr_resize(void * arr)
     size_t capacity = dyn_arr_capacity(arr);
     size_t stride = dyn_arr_stride(arr);
     capacity *= DYN_ARR_RESIZE_FACTOR;
-    arr = realloc((size_t *)arr - DYN_ARR_FIELDS, header_size + capacity*stride) + header_size;
+    arr = (char *) realloc((size_t *)arr - DYN_ARR_FIELDS, header_size + capacity*stride) + header_size;
     _dyn_arr_field_set(arr, DYN_ARR_CAPACITY, capacity);
     return arr;
 }

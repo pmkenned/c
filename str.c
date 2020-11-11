@@ -5,10 +5,10 @@
 #include "dyn_arr.h"
 #include "wrapper.h"
 
-// TODO: require cap of at least 1
+/* TODO: require cap of at least 1 */
 char * str_create_prealloc(size_t cap)
 {
-    char * s = malloc(STR_HEADER_SIZE + sizeof(*s)*(cap+1)) + STR_HEADER_SIZE;
+    char * s = (char *) malloc(STR_HEADER_SIZE + sizeof(*s)*(cap+1)) + STR_HEADER_SIZE;
     s[0] = '\0';
 
     _str_field_set(s, STR_CAPACITY, cap);
@@ -40,13 +40,11 @@ char * _str_copy(char * dst, const char * src)
 char ** str_tokenize(const char * s, const char * delim)
 {
     size_t l = strlen(s);
-
-    char * temp = malloc(sizeof(*temp)*(l+1));
+    char * tok;
+    char ** str_arr = (char **) dyn_arr_create(char *);
+    char * temp = (char *) malloc(sizeof(*temp)*(l+1));
     strcpy(temp, s);
-
-    char ** str_arr = dyn_arr_create(char *);
-
-    char * tok = strtok(temp, delim);
+    tok = strtok(temp, delim);
     while (tok != NULL) {
         char * new_s = str_create_from(tok);
         dyn_arr_append(str_arr, new_s);
@@ -60,7 +58,7 @@ char ** str_tokenize(const char * s, const char * delim)
 
 char * _str_resize(char * s, size_t new_cap)
 {
-    s = realloc(s - STR_HEADER_SIZE, STR_HEADER_SIZE + sizeof(*s)*(new_cap+1)) + STR_HEADER_SIZE;
+    s = (char *) realloc(s - STR_HEADER_SIZE, STR_HEADER_SIZE + sizeof(*s)*(new_cap+1)) + STR_HEADER_SIZE;
     _str_field_set(s, STR_CAPACITY, new_cap);
     return s;
 }

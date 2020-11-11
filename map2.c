@@ -4,22 +4,22 @@
 #include "map2.h"
 
 const size_t type_sizes[TYPE_COUNT] = {
-    sizeof(short),              // TYPE_SHORT
-    sizeof(unsigned short),     // TYPE_USHORT
-    sizeof(int),                // TYPE_INT
-    sizeof(unsigned int),       // TYPE_UINT
-    sizeof(long),               // TYPE_LONG
-    sizeof(unsigned long),      // TYPE_ULONG,
-    sizeof(char),               // TYPE_CHAR,
-    sizeof(unsigned char),      // TYPE_UCHAR,
-    sizeof(signed char),        // TYPE_SCHAR,
-    sizeof(float),              // TYPE_FLOAT,
-    sizeof(double),             // TYPE_DOUBLE,
-    sizeof(char *),             // TYPE_C_STR,
-    sizeof(void *),             // TYPE_PTR,
-    0,                          // TYPE_DYN_ARR,
-    0,                          // TYPE_MAP,
-    0                           // TYPE_LIST,
+    sizeof(short),              /* TYPE_SHORT       */
+    sizeof(unsigned short),     /* TYPE_USHORT      */
+    sizeof(int),                /* TYPE_INT         */
+    sizeof(unsigned int),       /* TYPE_UINT        */
+    sizeof(long),               /* TYPE_LONG        */
+    sizeof(unsigned long),      /* TYPE_ULONG,      */
+    sizeof(char),               /* TYPE_CHAR,       */
+    sizeof(unsigned char),      /* TYPE_UCHAR,      */
+    sizeof(signed char),        /* TYPE_SCHAR,      */
+    sizeof(float),              /* TYPE_FLOAT,      */
+    sizeof(double),             /* TYPE_DOUBLE,     */
+    sizeof(char *),             /* TYPE_C_STR,      */
+    sizeof(void *),             /* TYPE_PTR,        */
+    0,                          /* TYPE_DYN_ARR,    */
+    0,                          /* TYPE_MAP,        */
+    0                           /* TYPE_LIST,       */ 
 };
 
 struct map2_t {
@@ -38,12 +38,14 @@ map2_t * _map2_create(size_t value_size, size_t cap)
     map->cap = cap;
     memset(map->keys, 0, (sizeof(char *)+value_size)*cap);
 
-    //for (i=0; i<cap; i++)
-    //    map->keys[i] = NULL;
-    //memset(MAP2_VALUES(map), 0, cap*value_size);
+#if 0
+    for (i=0; i<cap; i++)
+        map->keys[i] = NULL;
+    memset(MAP2_VALUES(map), 0, cap*value_size);
 
-    //map->keys[2] = hello;
-    //((int *)MAP2_VALUES(map))[2] = 3;
+    map->keys[2] = hello;
+    ((int *)MAP2_VALUES(map))[2] = 3;
+#endif
 
     return map;
 }
@@ -53,10 +55,10 @@ void map2_destroy(map2_t * map)
     free(map);
 }
 
-// TODO: fix memory leak
+/* TODO: fix memory leak */
 void map2_set(map2_t * map, const char * key, const void * value)
 {
-    size_t idx = key[0] % map->cap; // TODO
+    size_t idx = key[0] % map->cap; /* TODO */
     map->keys[idx] = malloc(strlen(key)+1);
     strcpy(map->keys[idx], key);
     MAP2_VALUES_AS(map, char *)[idx] = malloc(strlen(value)+1);
@@ -88,25 +90,27 @@ void map2_print(map2_t * map)
 
 /* type b */
 
-//// TODO: think about padding
-//typedef struct {
-//    char * key;
-//    int value;
-////    void * value;
-//} kv_pair_t;
-//
-//struct map2b_t {
-//    type_t type;
-//    size_t cap;
-//    kv_pair_t kvs[1];
-//};
+#if 0
+/* TODO: think about padding */
+typedef struct {
+    char * key;
+    int value;
+/*    void * value; */
+} kv_pair_t;
+
+struct map2b_t {
+    type_t type;
+    size_t cap;
+    kv_pair_t kvs[1];
+};
+#endif
 
 struct map2b_t {
     type_t type;
     size_t cap;
 };
 
-// INT
+/* INT */
 
 typedef struct {
     char * key;
@@ -119,7 +123,7 @@ typedef struct {
     kv_int_t kvs[1];
 } map2b_int_t;
 
-// PTR
+/* PTR */
 
 typedef struct {
     char * key;
@@ -132,7 +136,7 @@ typedef struct {
     kv_ptr_t kvs[1];
 } map2b_ptr_t;
 
-// C_STR
+/* C_STR */
 
 typedef struct {
     char * key;
@@ -145,18 +149,20 @@ typedef struct {
     kv_c_str_t kvs[1];
 } map2b_c_str_t;
 
-//map2b_t * _map2b_create(type_t type, size_t cap)
-//{
-//    map2b_t * map = malloc(sizeof(*map) + sizeof(kv_pair_t)*(cap-1));
-//
-//    map->type = type;
-//    map->cap = cap;
-//    memset(map->kvs, 0, sizeof(kv_pair_t)*cap);
-//
-//    return map;
-//}
+#if 0
+map2b_t * _map2b_create(type_t type, size_t cap)
+{
+    map2b_t * map = malloc(sizeof(*map) + sizeof(kv_pair_t)*(cap-1));
 
-// TODO: consider using type_size(type) to do ptr arith instead of switch
+    map->type = type;
+    map->cap = cap;
+    memset(map->kvs, 0, sizeof(kv_pair_t)*cap);
+
+    return map;
+}
+#endif
+
+/* TODO: consider using type_size(type) to do ptr arith instead of switch */
 map2b_t * _map2b_create(type_t type, size_t cap)
 {
     map2b_t * map;
@@ -207,16 +213,16 @@ void map2b_destroy(map2b_t * map)
             default:
                 break;
         }
-        //if (map->kvs[i].value != NULL)
-        //    free(map->kvs[i].value);
+        /*if (map->kvs[i].value != NULL)
+              free(map->kvs[i].value); */
     }
 }
 
 void map2b_set(map2b_t * map, const char * key, const void * value)
 {
-    size_t idx = key[0] % map->cap; // TODO
-    //map->kvs[idx].key = malloc(strlen(key)+1);
-    //strcpy(map->kvs[idx].key, key);
+    size_t idx = key[0] % map->cap; /* TODO */
+    /*map->kvs[idx].key = malloc(strlen(key)+1);
+      strcpy(map->kvs[idx].key, key); */
     switch (map->type) {
         case TYPE_INT: {
             map2b_int_t * _map = (map2b_int_t *) map;
@@ -243,16 +249,16 @@ void map2b_set(map2b_t * map, const char * key, const void * value)
         default:
             break;
     }
-    //map->kvs[idx].value = malloc(strlen(value)+1);
-    //strcpy(map->kvs[idx].value, value);
+    /*map->kvs[idx].value = malloc(strlen(value)+1);
+      strcpy(map->kvs[idx].value, value); */
 }
 
 void map2b_print(map2b_t * map)
 {
     size_t i;
     for (i=0; i<map->cap; i++) {
-        //if (map->kvs[i].key == NULL)
-        //    continue;
+        /*if (map->kvs[i].key == NULL)
+              continue; */
         switch (map->type) {
             case TYPE_INT:
                 if (((map2b_int_t *)map)->kvs[i].key == NULL)
@@ -270,7 +276,7 @@ void map2b_print(map2b_t * map)
                 printf("%s: %p\n", ((map2b_ptr_t *)map)->kvs[i].key, ((map2b_ptr_t *)map)->kvs[i].value);
                 break;
             default:
-                //printf("%s: %p\n", map->kvs[i].key, (const char *)(map->kvs[i].value));
+                /*printf("%s: %p\n", map->kvs[i].key, (const char *)(map->kvs[i].value)); */
                 break;
         }
     }

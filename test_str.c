@@ -7,22 +7,25 @@
 #include "wrapper.h"
 #include "minunit.h"
 
-//char * test_str();
-//char * test_dyn_arr_str();
-//char * test_str_tokenize();
-//char * test_str_tokenize_file();
+#if 0
+char * test_str();
+char * test_dyn_arr_str();
+char * test_str_tokenize();
+char * test_str_tokenize_file();
+#endif
 
 #define BUFFER_LEN 1024
 static char buffer[BUFFER_LEN];
 
 char * test_str()
 {
+    size_t len;
     const char target_str[] = "hello, world!";
     char * s = str_create_from("hello, ");
     str_concat(s, "world!");
     mu_assert(strcmp(s, target_str) == 0, "string should be %s", target_str);
-    size_t len = str_length(s);
-    mu_assert(len == sizeof(target_str)-1, "length of s should be %zu, not %zu", sizeof(target_str)-1, len);
+    len = str_length(s);
+    mu_assert(len == sizeof(target_str)-1, "length of s should be %lu, not %lu", (unsigned long) (sizeof(target_str)-1), (unsigned long) len);
     str_destroy(s);
     return 0;
 }
@@ -69,16 +72,17 @@ char * test_str_tokenize()
 char * test_str_tokenize_file()
 {
     size_t i;
+    char ** tokens;
     FILE * fp = Fopen("data/hello.txt", "r");
     char * file_contents = str_create();
     while (fgets(buffer, BUFFER_LEN, fp) != NULL)
         str_concat(file_contents, buffer);
     fclose(fp);
-    char ** tokens = str_tokenize(file_contents, " \n");
+    tokens = str_tokenize(file_contents, " \n");
     str_destroy(file_contents);
 
-    //for (i=0; i<dyn_arr_length(tokens); i++)
-    //    printf("token[%zu]: '%s'\n", i, tokens[i]);
+    /*for (i=0; i<dyn_arr_length(tokens); i++)
+          printf("token[%zu]: '%s'\n", i, tokens[i]);*/
 
     for (i=0; i<dyn_arr_length(tokens); i++)
         str_destroy(tokens[i]);

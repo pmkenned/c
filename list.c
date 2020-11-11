@@ -3,12 +3,13 @@
 #include <stdint.h>
 #include "list.h"
 
-// TODO: variadic append
-// TODO: write inline error handling wrapper functions
-// TODO: use DEBUG
-// TODO: sort function, reverse, contains, index_of, unique
-// TODO: consider adding some spare node pointers
-// TODO: separate interface from implementation
+/* TODO: variadic append
+ * TODO: write inline error handling wrapper functions
+ * TODO: use DEBUG
+ * TODO: sort function, reverse, contains, index_of, unique
+ * TODO: consider adding some spare node pointers
+ * TODO: separate interface from implementation
+ */
 
 int list_error = 0;
 
@@ -20,6 +21,8 @@ list_t list_create() {
 
 static list_node_t * list_traverse(const list_t * list, size_t index) {
 
+    list_node_t * node;
+    int get_last;
     list_error = 0;
 
     if (list == NULL) {
@@ -27,14 +30,14 @@ static list_node_t * list_traverse(const list_t * list, size_t index) {
         return NULL;
     }
 
-    list_node_t * node = list->head;
+    node = list->head;
 
     if (node == NULL) {
         list_error = LIST_ERR_INVALID_INDEX;
         return NULL;
     }
 
-    const int get_last = (index == SIZE_MAX) ? 1 : 0;
+    get_last = (index == SIZE_MAX) ? 1 : 0;
 
     while (index > 0) {
         if (node->next == NULL) {
@@ -52,18 +55,21 @@ static list_node_t * list_traverse(const list_t * list, size_t index) {
 
 node_data_t list_get(const list_t * list, size_t index) {
 
+    const list_node_t * node;
     list_error = 0;
 
     if (list == NULL) {
+        node_data_t dummy = { 0 };
         list_error = LIST_ERR_NULL_LIST_PTR;
-        return (node_data_t) 0;
+        return dummy;
     }
 
-    const list_node_t * node = list_traverse(list, index);
+    node = list_traverse(list, index);
 
     if (node == NULL) {
+        node_data_t dummy = { 0 };
         list_error = LIST_ERR_INVALID_INDEX;
-        return (node_data_t) 0;
+        return dummy;
     }
 
     return node->data;
@@ -71,6 +77,7 @@ node_data_t list_get(const list_t * list, size_t index) {
 
 void list_set(list_t * list, size_t index, node_data_t x) {
 
+    list_node_t * node;
     list_error = 0;
 
     if (list == NULL) {
@@ -78,22 +85,23 @@ void list_set(list_t * list, size_t index, node_data_t x) {
         return;
     }
 
-    list_node_t * node = list_traverse(list, index);
+    node = list_traverse(list, index);
     if (node == NULL && list_error == LIST_ERR_INVALID_INDEX) {
         return;
     }
     node->data = x;
 }
 
-// TODO: think about error handling
+/* TODO: think about error handling */
 void list_append(list_t * list, node_data_t x) {
+    list_node_t * new_node;
     list_error = 0;
     if (list == NULL) {
         list_error = LIST_ERR_NULL_LIST_PTR;
         return;
     }
 
-    list_node_t * new_node = malloc(sizeof(*new_node));
+    new_node = malloc(sizeof(*new_node));
 
     new_node->data = x;
     new_node->next = NULL;
@@ -120,9 +128,10 @@ void list_insert(list_t * list, size_t index, node_data_t x) {
         list->head = new_node;
     } else {
         list_node_t * node = list_traverse(list, index-1);
+        list_node_t * new_node;
         if (node == NULL)
             return;
-        list_node_t * new_node = malloc(sizeof(*new_node));
+        new_node = malloc(sizeof(*new_node));
         new_node->data = x;
         new_node->next = node->next;
         node->next = new_node;
@@ -146,11 +155,12 @@ void list_remove(list_t * list, size_t index) {
         free(old_head);
     } else {
         list_node_t * node = list_traverse(list, index-1);
+        list_node_t * old_node;
         if (node == NULL || node->next == NULL) {
             list_error = LIST_ERR_INVALID_INDEX;
             return;
         }
-        list_node_t * old_node = node->next;
+        old_node = node->next;
         node->next = old_node->next;
         free(old_node);
     }
@@ -177,17 +187,18 @@ void list_destroy(list_t * list) {
     list->head = NULL;
 }
 
-inline void list_clear(list_t * list) {
+void list_clear(list_t * list) {
     list_destroy(list);
 }
 
-// TODO: should this return error if list == NULL?
+/* TODO: should this return error if list == NULL? */
 size_t list_length(const list_t * list) {
+    size_t n;
+    list_node_t * node;
     if (list == NULL)
         return 0;
 
-    list_node_t * node = list->head;
-    size_t n;
+    node = list->head;
 
     for (n=0; node != NULL; n++) {
         node = node->next;
@@ -198,17 +209,18 @@ size_t list_length(const list_t * list) {
 
 list_t list_dup(const list_t * src) {
 
-    list_error = 0;
     list_t dst = list_create();
+    const list_node_t * src_node_ptr;
+    list_node_t * prev_dst_node_ptr = NULL;
+    list_error = 0;
 
     if (src == NULL) {
         list_error = LIST_ERR_NULL_LIST_PTR;
         return dst;
     }
 
-    const list_node_t * src_node_ptr = src->head;
+    src_node_ptr = src->head;
 
-    list_node_t * prev_dst_node_ptr = NULL;
     while (src_node_ptr != NULL) {
         list_node_t * dst_node_ptr = malloc(sizeof(*dst_node_ptr));
         dst_node_ptr->next = NULL;
@@ -224,22 +236,28 @@ list_t list_dup(const list_t * src) {
     return dst;
 }
 
-// TODO: make string big enough
-// TODO: should maybe accept function pointer to stringify each item
+/* TODO: make string big enough */
+/* TODO: should maybe accept function pointer to stringify each item */
 char * list_to_str(const list_t * list) {
+    char * str;
+    char * buffer;
+    const list_node_t * node;
+    int remaining;
+
     if (list == NULL)
         return NULL;
 
-    char * str = malloc(sizeof(*str)*1024);
-    char * buffer = str;
-    const list_node_t * node = list->head;
+    str = malloc(sizeof(*str)*1024);
+    buffer = str;
+    node = list->head;
     buffer[0] = '[';
     buffer[1] = '\0';
     buffer++;
-    int remaining = 1023;
+    remaining = 1023;
     while (node != NULL) {
         const char * fmt = (node->next == NULL) ? "%d" : "%d, ";
-        int num_bytes = snprintf(buffer, remaining, fmt, node->data.i);
+        /* int num_bytes = snprintf(buffer, remaining, fmt, node->data.i); */
+        int num_bytes = sprintf(buffer, fmt, node->data.i);
         node = node->next;
         buffer += num_bytes;
         remaining -= num_bytes;

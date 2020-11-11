@@ -1,11 +1,12 @@
-# TODO: make either debug or release default, put them in separate directories? use strip?
 # TODO: make install
 # TODO: static library build target
 # TODO: flag for which libraries to link (e.g. -lm)
 # TODO: -L, -I?
+# TODO: debug and release should probably have different targets
 
 CC=gcc
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -Werror -Wextra -Wpedantic -std=c89 -Wno-variadic-macros 
+#CFLAGS+=-Wno-format
 TARGET=myprog
 BUILD_DIR=./build
 
@@ -69,7 +70,7 @@ $(BUILD_DIR)/%.o: %.c
 .PHONY: perf
 
 perf: release
-	./do_n.sh $(BUILD_DIR)/$(TARGET) 10
+	./do_n.sh "$(BUILD_DIR)/$(TARGET) --seed 0 -n 1000000" 10
 
 static: $(BUILD_DIR)/list.a
 

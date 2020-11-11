@@ -18,7 +18,7 @@ max="0"
 sum="0"
 avg="0"
 while [ "$i" -le "$N" ]; do
-    t="$(time ( $PROG > /dev/null) 2>&1 > /dev/null)"
+    t="$(time ( $PROG > /dev/null) 2>&1)"
     sum="$(echo $sum + $t | bc -l)"
     echo "$i: $t"
     i=$(($i + 1))

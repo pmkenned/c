@@ -1,22 +1,27 @@
 #ifndef DYN_ARR_H
 #define DYN_ARR_H
 
-// TODO:
-// * append (push_back, push_front, pop_back, pop_front)
-// * concat
-// * get by index
-// * set by index
-// * remove by index
-// * insert at index
-// * reserve
-// * get capacity
-// * resize
-// * sort (qsort?)
-// * clear
-// * contains
-// * index of
-// * copy
-// * get data ptr?
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* TODO:
+   * append (push_back, push_front, pop_back, pop_front)
+   * concat
+   * get by index
+   * set by index
+   * remove by index
+   * insert at index
+   * reserve
+   * get capacity
+   * resize
+   * sort (qsort?)
+   * clear
+   * contains
+   * index of
+   * copy
+   * get data ptr?
+*/
 
 #define DYN_ARR_INIT_CAP 10
 #define DYN_ARR_RESIZE_FACTOR 2
@@ -51,5 +56,9 @@ void *      _dyn_arr_append_arr(void * dst, void * src);
     } while(0)
 
 #define dyn_arr_append_arr(dst, src)        dst = _dyn_arr_append_arr(dst, src)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DYN_ARR_H */
