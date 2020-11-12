@@ -1,26 +1,63 @@
 # c
 Practicing C
 
-TODO:
+## TODO:
 
-* Data structures
+* modularity
+* portability
+* documentation
+* logging
+* timing, profiling & instrumenting
+* testing
+* debugging, coredump
+* performance
+* malloc debug
+* static linking
+* dynamic linking (shared libs, plugins, interactive programming)
+* coding standards
+* serialization
+* regex
+* IPC, mm files, named pipes, mmap
+* error handling
+* multithreading, child processes
+* network
+* graphics
+* gui
+* sound, images
+* signals
+* data structures
+    * AOS vs SOA
     * doubly linked list
     * dynamic array
     * strings
     * hashmap
     * graph
     * tree
-* Network code
-* write documentation
-* malloc debug
 
-Tools to learn:
+## misc:
 
+* binary tree
+* opaque structures
+* const *
+* typedef structs, []
+* char [1] trick
+* struct composition
+* typedef type
+* `##` token concatenation
+* map of maps
+* sorted?
+* `static_assert`
+* termios
+
+## Tools to learn:
+
+* splint
+* valgrind
 * make
 * git
-* valgrind
-* splint
 * makeprg (vim)
+
+## File Structure
 
 ```
 src/
@@ -42,22 +79,7 @@ Makefile
 README.md
 ```
 
-serialization
-coredumps
-SOA vs AOS
-binary tree
-opaque structures
-const *
-typedef structs, []
-char [1]
-struct composition
-typedef type
-error handling
-profiling
-`##` token concatenation
-map of maps
-malloc debug
-sorted?
+## Code Samples
 
 ```
 typedef enum {
@@ -90,26 +112,7 @@ void my_set_value(MyHeader * h, double value)
 }
 ```
 
-* sockets
-* threads
-* mmap
-* signals
-* GUI
-* graphics
-* sound, images
-* termios
-
-Things to practice/think about:
-
-* Moluarity, Interface vs. implementation
-* Performance, profiling
-* Testing
-* Debugging
-* Error-handling
-* C++ linkage
-* `static_assert`
-
-References:
+## References:
 
 * [OS detecting makefile](https://stackoverflow.com/questions/714100/os-detecting-makefile)
 * [Practical Makefiles, by example](http://nuclear.mutantstargoat.com/articles/make/#writing-install-uninstall-rules)
