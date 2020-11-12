@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "list.h"
 
 /* TODO: variadic append

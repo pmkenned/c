@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include "dyn_arr.h"
-#include "str.h"
-#include "map.h"
+#if 0
+#include "../src/dyn_arr.h"
+#include "../src/str.h"
+#include "../src/map.h"
+#endif
 #include "minunit.h"
 
 char * list_tests();

@@ -3,6 +3,8 @@
 #include <time.h>
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
+#include <pthread.h>
 #include "wrapper.h"
 #include "parse_options.h"
 #include "dyn_arr.h"
@@ -35,11 +37,19 @@ usage(int exit_code)
     exit(exit_code);
 }
 
+void * perform_work(void * args)
+{
+	printf("%p\n", args);
+    return NULL;
+}
+
 int
 main(int argc, char ** argv)
 {
+    pthread_t thread;
+    int thread_arg;
     size_t i;
-    FILE * default_fp = Fopen("/usr/share/dict/words", "r"); /* stdin */
+    FILE * default_fp;
     char * file_contents;
     char ** non_option_args;
     char ** tokens;
@@ -81,6 +91,7 @@ main(int argc, char ** argv)
         ;
     */
 
+    default_fp = Fopen("/usr/share/dict/words", "r"); /* stdin */
     in_fp = (num_non_option_args == 0) ? default_fp : Fopen(non_option_args[0], "r");
 
     file_contents = str_create();
@@ -104,6 +115,18 @@ main(int argc, char ** argv)
             (*x_p)++;
     }
     map_print(token_map);
+
+    pthread_create(&thread, NULL, perform_work, &thread_arg);
+    pthread_join(thread, NULL);
+
+    printf("%f\n", sqrt(2.0));
+
+#ifdef WIN32
+    printf("this is a windows binary\n");
+#endif
+#ifdef LINUX
+    printf("this is a linux binary\n");
+#endif
 
     return 0;
 }

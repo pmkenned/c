@@ -1,6 +1,10 @@
 #ifndef MAP2_H
 #define MAP2_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAP2_INIT_CAP 10
 
 typedef struct map2_t map2_t;
@@ -70,5 +74,9 @@ void map2b_set(map2b_t * map, const char * key, const void * value);
 void map2b_print(map2b_t * map);
 
 #define map2b_create(type) _map2b_create(type, MAP2_INIT_CAP)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MAP2_H */

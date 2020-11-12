@@ -1,8 +1,7 @@
 #include <malloc.h>
 #include <string.h>
-#include <stdlib.h> /* for exit() */
-#include <stdio.h> /* for fprintf() */
 #include <assert.h>
+#include <stdio.h>
 #include "dyn_arr.h"
 #include "str.h"
 #include "map.h"

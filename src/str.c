@@ -41,7 +41,7 @@ char ** str_tokenize(const char * s, const char * delim)
 {
     size_t l = strlen(s);
     char * tok;
-    char ** str_arr = (char **) dyn_arr_create(char *);
+    char ** str_arr = dyn_arr_create(char *);
     char * temp = (char *) malloc(sizeof(*temp)*(l+1));
     strcpy(temp, s);
     tok = strtok(temp, delim);

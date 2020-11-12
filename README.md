@@ -108,3 +108,8 @@ Things to practice/think about:
 * Error-handling
 * C++ linkage
 * `static_assert`
+
+References:
+
+* [OS detecting makefile](https://stackoverflow.com/questions/714100/os-detecting-makefile)
+* [Practical Makefiles, by example](http://nuclear.mutantstargoat.com/articles/make/#writing-install-uninstall-rules)

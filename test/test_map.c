@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "dyn_arr.h"
-#include "str.h"
-#include "map.h"
-#include "wrapper.h"
+#include "../src/dyn_arr.h"
+#include "../src/str.h"
+#include "../src/map.h"
+#include "../src/wrapper.h"
 #include "minunit.h"
 
 #if 0
