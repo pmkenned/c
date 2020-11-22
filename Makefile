@@ -39,11 +39,11 @@ endif
 
 # SET DEFINES BASED ON OPERATING SYSTEM
 ifeq ($(DETECTED_OS),Windows)
-	CFLAGS += -DWIN32
+	CPPFLAGS += -DWIN32
 	LIB_TARGET=libmylib.lib
 endif
 ifeq ($(DETECTED_OS),Linux)
-	CFLAGS += -DLINUX
+	CPPFLAGS += -DLINUX
 	LIB_TARGET=libmylib.a
 endif
 

@@ -1,6 +1,14 @@
 # c
 Practicing C
 
+## Projects
+
+* bug database
+* pkgg: game
+* ped: text editor
+* duphunt: find and delete duplicate files
+* hltdb: half-life texture database
+
 ## TODO:
 
 * modularity
@@ -47,7 +55,7 @@ Practicing C
 * map of maps
 * sorted?
 * `static_assert`
-* termios
+* termios, ncurses
 
 ## Tools to learn:
 
@@ -77,39 +85,6 @@ examples/
   example1.c
 Makefile
 README.md
-```
-
-## Code Samples
-
-```
-typedef enum {
-    MST_INT,
-    MST_FLOAT,
-    MST_COUNT
-} MyStructType;
-
-typedef struct {
-    char  name[32];
-    MyStructType type;
-} MyHeader;
-
-typedef struct {
-    MyHeader head;
-    int value;
-} MyStructInt;
-
-typedef struct {
-    MyHeader head;
-    float vlaue;
-} MyStructFloat;
-
-void my_set_value(MyHeader * h, double value)
-{
-    if (h->type == MST_INT)
-        ((MyStructInt *)h)->value = (int) value;
-    else if (h->type == MST_FLOAT)
-        ((MyStructFloat *)h)->value = (float) value;
-}
 ```
 
 ## References:
