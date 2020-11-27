@@ -12,7 +12,7 @@
 
 CC=gcc
 #CPPFLAGS=-I/usr/include
-CFLAGS=-Wall -Werror -Wextra -Wpedantic -std=c89 -Wno-variadic-macros 
+CFLAGS=-Wall -Werror -Wextra -pedantic -std=c89 -Wno-variadic-macros 
 #CFLAGS+=-Wno-format
 #LDFLAGS=-nodefaultlibs -L/usr/lib
 LDLIBS=-lpthread
