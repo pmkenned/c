@@ -59,6 +59,9 @@ static struct {
 
 static uint8_t buffer[BUFFER_SIZE];
 
+/* TODO: consider moving this to interface */
+static pixel_t default_px = PX_RGB(0, 0, 0);
+
 /* ==== functions ==== */
 
 /* private functions */
@@ -150,14 +153,30 @@ bmp_t * bmp_create_w_h(int w, int h) {
     return bmp_new;
 }
 
+bmp_t * bmp_create_copy(bmp_t * bmp)
+{
+    bmp_t * bmp_new = calloc(1, sizeof(*bmp_new));
+    int w = bmp->width;
+    int h = bmp->height;
+    bmp_new->width = w;
+    bmp_new->height = h;
+    bmp_new->px_data = calloc(w*h, sizeof(*bmp_new->px_data));
+    memcpy(bmp_new->px_data, bmp->px_data, w*h*sizeof(*bmp_new->px_data));
+    return bmp_new;
+}
+
 void bmp_destroy(bmp_t * bmp) {
     free(bmp->px_data);
     free(bmp);
 }
 
 pixel_t bmp_get_px(const bmp_t * bmp, int r, int c) {
+#if 0
     assert(c < bmp->width);
     assert(r < bmp->height);
+#endif
+    if ((c < 0) || (c >= bmp->width) || (r < 0) || (r >= bmp->height))
+        return default_px;
     return bmp->px_data[r*bmp->width + c];
 }
 
@@ -170,8 +189,14 @@ int bmp_get_h(const bmp_t * bmp) {
 }
         
 void bmp_set_px(bmp_t * bmp, int r, int c, pixel_t px) {
+#if 0
+    assert(c >= 0);
+    assert(r >= 0);
     assert(c < bmp->width);
     assert(r < bmp->height);
+#endif
+    if ((c < 0) || (c >= bmp->width) || (r < 0) || (r >= bmp->height))
+        return;
     bmp->px_data[r*bmp->width + c] = px;
 }
 

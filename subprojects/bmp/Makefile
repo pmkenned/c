@@ -1,8 +1,8 @@
 CC ?= gcc
 CPPFLAGS +=
-CFLAGS += -Wall -Wextra -pedantic -std=c99 -ggdb
+CFLAGS += -Wall -Wextra -pedantic -std=c99 -Wno-unused-function
 LDFLAGS +=
-LDLIBS += -lncurses
+LDLIBS += -lncurses -lm
 
 TARGET=a.out
 BUILD_DIR=./build
@@ -10,6 +10,9 @@ SRC=main.c\
 	bmp.c
 OBJ=$(SRC:%.c=$(BUILD_DIR)/%.o)
 DEP=$(OBJ:%.o=%.d)
+
+CFLAGS += -ggdb
+#CFLAGS += -O2 -DNDEBUG
 
 .PHONY: all run clean
 

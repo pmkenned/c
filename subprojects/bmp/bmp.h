@@ -36,6 +36,7 @@ typedef uint32_t pixel_t ;
 
 extern bmp_t * bmp_create();
 extern bmp_t * bmp_create_w_h(int w, int h);
+extern bmp_t * bmp_create_copy(bmp_t * bmp);
 extern void    bmp_destroy(bmp_t * bmp);
 
 extern pixel_t bmp_get_px(const bmp_t * bmp, int r, int c);
