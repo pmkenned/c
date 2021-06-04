@@ -1,6 +1,6 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS=-Wall -Wextra -pedantic -std=c99
+CFLAGS=-Wall -Wextra -pedantic -std=c99 -Wno-unused-variable -Wno-unused-but-set-variable
 LDFLAGS=
 LDLIBS=
 
