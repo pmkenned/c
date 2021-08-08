@@ -24,8 +24,8 @@ TEST_DIR=./test
 BUILD_DIR=./build
 DEBUG_DIR=$(BUILD_DIR)/debug
 RELEASE_DIR=$(BUILD_DIR)/release
-TEST_RELEASE_DIR=$(BUILD_DIR)/test_debug
-TEST_DEBUG_DIR=$(BUILD_DIR)/test_release
+TEST_RELEASE_DIR=$(BUILD_DIR)/test_release
+TEST_DEBUG_DIR=$(BUILD_DIR)/test_debug
 
 CPP_TARGET=myprog_cpp
 CPP_RELEASE_DIR=$(BUILD_DIR)/release_cpp
