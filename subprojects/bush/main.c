@@ -79,9 +79,14 @@ void print_dir_tree_r(const char * dir_name, int depth)
             goto get_next_ent;
         if (strcmp(next_ent->d_name, "..") == 0)
             goto get_next_ent;
+        // ignore hidden
+        if (strncmp(next_ent->d_name, ".", 1) == 0)
+            goto get_next_ent;
         null_ent:
 
-        if ((strcmp(ent.d_name, ".") == 0) || (strcmp(ent.d_name, "..") == 0)) {
+        if ((strcmp(ent.d_name, ".") == 0) ||
+            (strcmp(ent.d_name, "..") == 0) ||
+            (strncmp(ent.d_name, ".", 1) == 0)) {
             ent_p = next_ent;
             continue;
         }
