@@ -1,14 +1,15 @@
 #include "elf.h"
+#include "common.h"
 #include <stdio.h>
 
 int main(int argc, char * argv[])
 {
-    if (argc < 2) {
-        fprintf(stderr, "usage: %d [ELF]\n", argv[0]);
-        return 1;
-    }
+    if (argc < 2)
+        die("usage: %s ELF\n", argv[0]);
 
-    elf_t my_elf = read_elf(argv[1]);
+    Elf elf = read_elf(argv[1]);
+    print_elf(elf, stdout);
+    destroy_elf(elf);
 
     return 0;
 }
