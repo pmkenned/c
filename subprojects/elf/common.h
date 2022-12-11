@@ -14,7 +14,7 @@ typedef struct {
 
 void die(const char * fmt, ...);
 void pack_le(void * p, size_t n, uint64_t x);
-uint64_t unpack_le(void * p, size_t n);
+uint64_t unpack_le(const void * p, size_t n);
 Buffer read_file(const char * filename);
 
 #endif /* COMMON_H */

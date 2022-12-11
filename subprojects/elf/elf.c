@@ -25,6 +25,16 @@ ELF_OSABI_LIST
 };
 #undef X
 
+#define X(ENUM, STR, NUM, FIELD) case NUM: return STR;
+static const char *
+elf_relocation_string(int num) {
+    switch (num) {
+X86_64_RELOCATIONS
+    }
+    return "";
+};
+#undef X
+
 static const char *
 elf_type_string(int num)
 {
@@ -50,10 +60,10 @@ elf_phdr_type_string(int num)
         case PT_SHLIB   : return "SHLIB";
         case PT_PHDR    : return "PHDR";
         case PT_TLS     : return "TLS";
-        case 1685382480 : return "GNU_EH_FRAME";
-        case 1685382481 : return "GNU_STACK";
-        case 1685382482 : return "GNU_RELRO";
-        case 1685382483 : return "GNU_PROPERTY";
+        case PT_GNU_EH_FRAME:   return "GNU_EH_FRAME";
+        case PT_GNU_STACK:      return "GNU_STACK";
+        case PT_GNU_RELRO:      return "GNU_RELRO";
+        case PT_GNU_PROPERTY:   return "GNU_PROPERTY";
     }
     return "";
 }
@@ -68,6 +78,9 @@ elf_sect_type_string(int num)
         case SHT_STRTAB          : return "STRTAB";
         case SHT_RELA            : return "RELA";
         case SHT_HASH            : return "HASH";
+        case SHT_GNU_HASH        : return "GNU_HASH";
+        case SHT_VERSYM          : return "VERSYM";
+        case SHT_VERNEED         : return "VERNEED";
         case SHT_DYNAMIC         : return "DYNAMIC";
         case SHT_NOTE            : return "NOTE";
         case SHT_NOBITS          : return "NOBITS";
@@ -200,12 +213,9 @@ read_elf(const char * filename)
     elf.section_headers = malloc(sizeof(*elf.section_headers) * elf.header.e_shnum);
     for (size_t i = 0; i < elf.header.e_shnum; i++) {
         char * p = buffer.p + elf.header.e_shoff + i*elf.header.e_shentsize;
-        //size_t sh_name = unpack_le(p, 4); // TODO
         elf.section_headers[i].sh_name      = unpack_le(p, 4);
-        //elf.section_headers[i].sh_name      = strdup(buffer.p + elf.header.e_shstrndx + sh_name);
-        //elf.section_headers[i].sh_name      = strdup("test");
         elf.section_headers[i].sh_type      = unpack_le(p + 4,                  4);
-        elf.section_headers[i].sh_flags     = unpack_le(p,                      8);
+        elf.section_headers[i].sh_flags     = unpack_le(p + 8,                  8);
         elf.section_headers[i].sh_addr      = unpack_le(p + (_64bit ? 16 : 12), 8);
         elf.section_headers[i].sh_offset    = unpack_le(p + (_64bit ? 24 : 16), 8);
         elf.section_headers[i].sh_size      = unpack_le(p + (_64bit ? 32 : 20), 8);
@@ -213,10 +223,6 @@ read_elf(const char * filename)
         elf.section_headers[i].sh_info      = unpack_le(p + (_64bit ? 44 : 28), 4);
         elf.section_headers[i].sh_addralign = unpack_le(p + (_64bit ? 48 : 32), 8);
         elf.section_headers[i].sh_entsize   = unpack_le(p + (_64bit ? 56 : 36), 8);
-    }
-
-    for (size_t i = 0; i < elf.header.e_shnum; i++) {
-        printf("FOO: %s\n", buffer.p + elf.section_headers[elf.header.e_shstrndx].sh_offset + elf.section_headers[i].sh_name);
     }
 
     elf.segments = malloc(sizeof(*elf.segments) * elf.header.e_phnum);
@@ -254,13 +260,70 @@ destroy_elf(Elf elf)
     elf.section_headers = NULL;
 }
 
-#if 1
 static const char *
 elf_section_name(Elf elf, size_t i)
 {
     return elf.sections[elf.header.e_shstrndx] + elf.section_headers[i].sh_name;
 }
-#endif
+
+static void
+elf_shdr_flag_str(char s[], uint32_t sh_flags)
+{
+    size_t i = 0;
+    if (sh_flags & 1)  s[i++] = 'W';
+    if (sh_flags & 2)  s[i++] = 'A';
+    if (sh_flags & 4)  s[i++] = 'X';
+    if (sh_flags & 16) s[i++] = 'M';
+    if (sh_flags & 32) s[i++] = 'S';
+    if (sh_flags & 64) s[i++] = 'I';
+    s[i] = '\0';
+}
+
+static void
+elf_phdr_flag_str(char s[], uint32_t p_flags)
+{
+    s[0] = (p_flags & 4) ? 'R' : ' ';
+    s[1] = (p_flags & 2) ? 'W' : ' ';
+    s[2] = (p_flags & 1) ? 'E' : ' ';
+    s[3] = '\0';
+}
+
+static const char *
+stt_string(uint8_t st_type)
+{
+    switch (st_type) {
+        case STT_NOTYPE:    return "NOTYPE";
+        case STT_OBJECT:    return "OBJECT";
+        case STT_FUNC:      return "FUNC";
+        case STT_SECTION:   return "SECTION";
+        case STT_FILE:      return "FILE";
+        case STT_COMMON:    return "COMMON";
+    }
+    return "";
+}
+
+static const char *
+stb_string(uint8_t st_bind)
+{
+    switch (st_bind) {
+        case STB_LOCAL:     return "LOCAL";
+        case STB_GLOBAL:    return "GLOBAL";
+        case STB_WEAK:      return "WEAK";
+    }
+    return "";
+}
+
+static const char *
+stv_string(uint8_t st_other)
+{
+    switch (st_other) {
+        case STV_DEFAULT:   return "DEFAULT";
+        case STV_INTERNAL:  return "INTERNAL";
+        case STV_HIDDEN:    return "HIDDEN";
+        case STV_PROTECTED: return "PROTECTED";
+    }
+    return "";
+}
 
 void
 print_elf(Elf elf, FILE * fp)
@@ -269,7 +332,7 @@ print_elf(Elf elf, FILE * fp)
         fprintf(fp, "error: %s\n", elferrstr(elf.error));
         return;
     }
-    fprintf(fp, "ELF Header\n");
+    fprintf(fp, "ELF Header:\n");
     fprintf(fp, "  Magic: ");
     for (size_t i = 0; i < 4; i++)
         fprintf(fp, "%02" PRIx8 " ", elf.header.e_ident.ei_mag[i]);
@@ -298,31 +361,91 @@ print_elf(Elf elf, FILE * fp)
     fprintf(fp, "Section Headers:\n");
     fprintf(fp, "  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al\n");
     for (size_t i = 0; i < elf.header.e_shnum; i++) {
+        ElfSectionHeader * sh = &elf.section_headers[i];
+        char sh_flags[7];
+        elf_shdr_flag_str(sh_flags, sh->sh_flags);
         fprintf(fp, "  [%2zu] ", i);
-        fprintf(fp, "%-17s ", elf_section_name(elf, i)); // TODO
-        //fprintf(fp, "%-18" PRId32, elf.section_headers[i].sh_name); // TODO
-        //fprintf(fp, "%-18s", elf.section_headers[i].sh_name);
-        fprintf(fp, "%-15s ", elf_sect_type_string(elf.section_headers[i].sh_type));
-        fprintf(fp, "%016" PRIx64 " ", elf.section_headers[i].sh_addr);
-        fprintf(fp, "%06" PRIx64 " ", elf.section_headers[i].sh_offset);
-        fprintf(fp, "%06" PRIx64 " ", elf.section_headers[i].sh_size);
-        fprintf(fp, "%02" PRIx64 " ", elf.section_headers[i].sh_entsize);
-        fprintf(fp, "%" PRId64 "\t", elf.section_headers[i].sh_flags); // TODO
-        fprintf(fp, "%" PRId32 " ", elf.section_headers[i].sh_link);
-        fprintf(fp, "%" PRId32 " ", elf.section_headers[i].sh_info);
-        fprintf(fp, "%" PRId64 "\n", elf.section_headers[i].sh_addralign);
+        fprintf(fp, "%-17s ", elf_section_name(elf, i));
+        fprintf(fp, "%-15s ", elf_sect_type_string(sh->sh_type));
+        fprintf(fp, "%016" PRIx64 " ",  sh->sh_addr);
+        fprintf(fp, "%06"  PRIx64 " ",  sh->sh_offset);
+        fprintf(fp, "%06"  PRIx64 " ",  sh->sh_size);
+        fprintf(fp, "%02"  PRIx64 " ",  sh->sh_entsize);
+        fprintf(fp, "%3s ", sh_flags);
+        fprintf(fp, "%2"   PRId32 " ",  sh->sh_link);
+        fprintf(fp, "%3"   PRId32 " ",  sh->sh_info);
+        fprintf(fp, "%2"   PRId64 "\n", sh->sh_addralign);
     }
 
-    fprintf(fp, "Program Headers\n");
+    fprintf(fp, "Program Headers:\n");
     fprintf(fp, "  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align\n");
     for (size_t i = 0; i < elf.header.e_phnum; i++) {
-        fprintf(fp, "  %-15s", elf_phdr_type_string(elf.program_headers[i].p_type));
-        fprintf(fp, "0x%06"  PRIx64 " ",  elf.program_headers[i].p_offset);
-        fprintf(fp, "0x%016" PRIx64 " ",  elf.program_headers[i].p_vaddr);
-        fprintf(fp, "0x%016" PRIx64 " ",  elf.program_headers[i].p_paddr);
-        fprintf(fp, "0x%06"  PRIx64 " ",  elf.program_headers[i].p_filesz);
-        fprintf(fp, "0x%06"  PRIx64 " ",  elf.program_headers[i].p_memsz);
-        fprintf(fp, "0x%"    PRIx32 " ",  elf.program_headers[i].p_flags); // TODO
-        fprintf(fp, "0x%"    PRIx64 "\n", elf.program_headers[i].p_align);
+        ElfProgramHeader * ph = &elf.program_headers[i];
+        char p_flags[4];
+        elf_phdr_flag_str(p_flags, ph->p_flags);
+        fprintf(fp, "  %-15s", elf_phdr_type_string(ph->p_type));
+        fprintf(fp, "0x%06"  PRIx64 " ",  ph->p_offset);
+        fprintf(fp, "0x%016" PRIx64 " ",  ph->p_vaddr);
+        fprintf(fp, "0x%016" PRIx64 " ",  ph->p_paddr);
+        fprintf(fp, "0x%06"  PRIx64 " ",  ph->p_filesz);
+        fprintf(fp, "0x%06"  PRIx64 " ",  ph->p_memsz);
+        fprintf(fp, "%-3s ", p_flags);
+        fprintf(fp, "0x%"    PRIx64 "\n", ph->p_align);
+    }
+    fprintf(fp, "\n");
+
+    fprintf(fp, " Section to Segment mapping:\n");
+    fprintf(fp, "  Segment Sections...\n");
+    for (size_t i = 0; i < elf.header.e_phnum; i++) {
+        fprintf(fp, "   %02zu\n", i); // TODO: determine which sections are in each segment
+    }
+    fprintf(fp, "\n");
+
+    for (size_t shi = 0; shi < elf.header.e_shnum; shi++) {
+        ElfSectionHeader * sh = &elf.section_headers[shi];
+        // TODO: also SHT_REL
+        if (sh->sh_type == SHT_RELA) {
+            size_t num_relocs = sh->sh_size / sh->sh_entsize; // TODO: check for divide by zero
+            fprintf(fp, "Relocation section '%s' at offset 0x%" PRIx64 " contains %zu entries:\n", elf_section_name(elf, shi), sh->sh_offset, num_relocs);
+            fprintf(fp, "    Offset             Info             Type               Symbol's Value  Symbol's Name + Addend\n");
+            for (size_t i = 0; i < num_relocs; i++) {
+                char * entry = elf.sections[shi] + sh->sh_entsize*i;
+                uint64_t rela_offset    = unpack_le(entry + 0, 8);
+                uint64_t rela_info      = unpack_le(entry + 8, 8);
+                fprintf(fp, "%016" PRIx64 "  %016" PRIx64 " %s                         %d\n", rela_offset, rela_info, elf_relocation_string(rela_info & 0xff), 0);
+            }
+            fprintf(fp, "\n");
+        }
+    }
+
+    for (size_t shi = 0; shi < elf.header.e_shnum; shi++) {
+        ElfSectionHeader * sh = &elf.section_headers[shi];
+        if (sh->sh_type == SHT_SYMTAB || sh->sh_type == SHT_DYNSYM) {
+            size_t num_symbols = sh->sh_size / sh->sh_entsize; // TODO: check for divide by zero
+            fprintf(fp, "Symbol table '%s' contains %zu entries:\n", elf_section_name(elf, shi), num_symbols);
+            fprintf(fp, "   Num:    Value          Size Type    Bind   Vis      Ndx Name\n");
+            for (size_t i = 0; i < num_symbols; i++) {
+                ElfSymbolTable st;
+                char * entry = elf.sections[shi] + sh->sh_entsize*i;
+                st.st_name    = unpack_le(entry + 0, 4);
+                st.st_info    = unpack_le(entry + 4, 1);
+                st.st_other   = unpack_le(entry + 5, 1);
+                st.st_shndx   = unpack_le(entry + 6, 2);
+                st.st_value   = unpack_le(entry + 8, 8);
+                st.st_size    = unpack_le(entry + 16, 8);
+                uint8_t st_bind = st.st_info >> 4;
+                uint8_t st_type = st.st_info & 0xf;
+                fprintf(fp, "%6zu: %016" PRIx64 " %5" PRId64 " %-7s %-6s %-8s ", i, st.st_value, st.st_size, stt_string(st_type), stb_string(st_bind), stv_string(st.st_other));
+                if (st.st_shndx == SHN_UNDEF) {
+                    fprintf(fp, "UND ");
+                } else if (st.st_shndx == SHN_ABS) {
+                    fprintf(fp, "ABS ");
+                } else {
+                    fprintf(fp, "%3" PRId16 " ", st.st_shndx);
+                }
+                fprintf(fp, "%s\n", elf.sections[sh->sh_link] + st.st_name);
+            }
+            fprintf(fp, "\n");
+        }
     }
 }

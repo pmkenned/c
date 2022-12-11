@@ -30,12 +30,12 @@ pack_le(void * p, size_t n, uint64_t x)
 }
 
 uint64_t
-unpack_le(void * p, size_t n)
+unpack_le(const void * p, size_t n)
 {
     assert(n <= 8);
     uint64_t x = 0;
     for (size_t i = 0; i < n; i++) {
-        x |= ((uint8_t *)p)[i] << 8*i;
+        x |= (uint64_t) ((uint8_t *)p)[i] << 8*i;
     }
     return x;
 }

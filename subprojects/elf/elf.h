@@ -240,6 +240,35 @@ X(EO_FENIX,     0x10, "FenixOS") \
 X(EO_NUXI,      0x11, "Nuxi CloudABI") \
 X(EO_OPENVOS,   0x12, "Stratus Technologies OpenVOS")
 
+#define X86_64_RELOCATIONS \
+X(R_X86_64_NONE,        "R_X86_64_NONE",        0,   None) \
+X(R_X86_64_64,          "R_X86_64_64",          1,   qword) \
+X(R_X86_64_PC32,        "R_X86_64_PC32",        2,   dword) \
+X(R_X86_64_GOT32,       "R_X86_64_GOT32",       3,   dword) \
+X(R_X86_64_PLT32,       "R_X86_64_PLT32",       4,   dword) \
+X(R_X86_64_COPY,        "R_X86_64_COPY",        5,   None) \
+X(R_X86_64_GLOB_DAT,    "R_X86_64_GLOB_DAT",    6,   qword) \
+X(R_X86_64_JUMP_SLOT,   "R_X86_64_JUMP_SLOT",   7,   qword) \
+X(R_X86_64_RELATIVE,    "R_X86_64_RELATIVE",    8,   qword) \
+X(R_X86_64_GOTPCREL,    "R_X86_64_GOTPCREL",    9,   dword) \
+X(R_X86_64_32,          "R_X86_64_32",          10,  dword) \
+X(R_X86_64_32S,         "R_X86_64_32S",         11,  dword) \
+X(R_X86_64_16,          "R_X86_64_16",          12,  word) \
+X(R_X86_64_PC16,        "R_X86_64_PC16",        13,  word) \
+X(R_X86_64_8,           "R_X86_64_8",           14,  word8) \
+X(R_X86_64_PC8,         "R_X86_64_PC8",         15,  word8) \
+X(R_X86_64_PC64,        "R_X86_64_PC64",        24,  qword) \
+X(R_X86_64_GOTOFF64,    "R_X86_64_GOTOFF64",    25,  qword) \
+X(R_X86_64_GOTPC32,     "R_X86_64_GOTPC32",     26,  dword) \
+X(R_X86_64_SIZE32,      "R_X86_64_SIZE32",      32,  dword) \
+X(R_X86_64_SIZE64,      "R_X86_64_SIZE64",      33,  qword) \
+
+#define X(ENUM, STR, NUM, FIELD) ENUM = NUM,
+enum {
+X86_64_RELOCATIONS
+};
+#undef X
+
 #define X(ENUM, NUM, STR) ENUM = NUM,
 enum {
 ELF_OSABI_LIST
@@ -255,6 +284,10 @@ enum {
     PT_SHLIB,
     PT_PHDR,
     PT_TLS,
+    PT_GNU_EH_FRAME = 1685382480,
+    PT_GNU_STACK    = 1685382481,
+    PT_GNU_RELRO    = 1685382482,
+    PT_GNU_PROPERTY = 1685382483,
 };
 
 enum {
@@ -277,6 +310,9 @@ enum {
     SHT_SYMTAB_SHNDX    = 0x12,
     SHT_NUM             = 0x13,
     SHT_LOOS            = 0x60000000,
+    SHT_GNU_HASH        = 0x6ffffff6,
+    SHT_VERNEED         = 0x6ffffffe,
+    SHT_VERSYM          = 0x6fffffff,
 };
 
 enum {
@@ -294,6 +330,33 @@ enum {
     SHF_MASKPROC            = 0xF0000000,  // Processor-specific
     SHF_ORDERED             = 0x4000000,   // Special ordering requirement (Solaris)
     SHF_EXCLUDE             = 0x8000000,   // Section is excluded unless referenced or allocated (Solaris) 
+};
+
+enum {
+    STT_NOTYPE,
+    STT_OBJECT,
+    STT_FUNC,
+    STT_SECTION,
+    STT_FILE,
+    STT_COMMON,
+};
+
+enum {
+    SHN_UNDEF   = 0,
+    SHN_ABS     = 0xfff1,
+};
+
+enum {
+    STB_LOCAL,
+    STB_GLOBAL,
+    STB_WEAK,
+};
+
+enum {
+    STV_DEFAULT,
+    STV_INTERNAL,
+    STV_HIDDEN,
+    STV_PROTECTED,
 };
 
 typedef struct {
@@ -333,7 +396,6 @@ typedef struct {
 
 typedef struct {
     uint32_t sh_name;
-    //char * sh_name;
     uint32_t sh_type;
     uint64_t sh_flags;
     uint64_t sh_addr;
@@ -344,6 +406,15 @@ typedef struct {
     uint64_t sh_addralign;
     uint64_t sh_entsize;
 } ElfSectionHeader;
+
+typedef struct {
+    uint32_t st_name;
+    uint8_t  st_info;
+    uint8_t  st_other;
+    uint16_t st_shndx;
+    uint64_t st_value;
+    uint64_t st_size;
+} ElfSymbolTable;
 
 typedef struct {
     bool valid;
