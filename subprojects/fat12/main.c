@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 void print_bytes(uint8_t * ptr, size_t num_bytes, size_t offset) {
     for(size_t i=0; i<num_bytes/16; i++) {
-        printf("%08x: ", i*16+offset);
+        printf("%08lx: ", i*16+offset);
         for(size_t j=0; j<2; j++) {
             for(size_t k=0; k<8; k++) {
                 size_t l = i*16+j*8+k;
@@ -34,6 +35,11 @@ int main(int argc, char * argv[]) {
     bsect_t bsector;
 
     init_bsect(&bsector);
+
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s FILE\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
     FILE * fp = fopen(argv[1], "rb");
 

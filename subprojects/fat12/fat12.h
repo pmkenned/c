@@ -37,4 +37,9 @@ typedef struct bsect
     uint8_t boot_sig[2];
 } bsect_t;
 
+void init_bsect(bsect_t * bsector_p);
+void print_fat(bsect_t * bsector, uint8_t * img_contents);
+void list_files(bsect_t * bsector, uint8_t * img_contents);
+unsigned char * get_file_contents(bsect_t * bsector, uint8_t * img_contents, const char * fname);
+
 #endif /* FAT12_H */

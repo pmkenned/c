@@ -24,11 +24,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 $(BUILD_DIR)/$(TARGET): $(OBJ)
-	mkdir -p $(@D)
+	@mkdir -p $(@D)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(BUILD_DIR)/%.o: %.c
-	mkdir -p $(@D)
+	@mkdir -p $(@D)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 -include $(DEP)

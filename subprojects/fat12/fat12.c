@@ -106,14 +106,14 @@ void print_fat(bsect_t * bsector, uint8_t * img_contents) {
 
 void list_files(bsect_t * bsector, uint8_t * img_contents) {
 
-    size_t spc = bsector->sectors_per_cluster;
+    //size_t spc = bsector->sectors_per_cluster;
     size_t bps = *((uint16_t *) bsector->bytes_per_sector);
     size_t spf = *((uint16_t *) bsector->sectors_per_fat);
     size_t num_fats = bsector->num_fats;
     size_t max_root_dir_entries = *((uint16_t *) bsector->max_root_dir_entries);
 
     size_t root_dir_offset = (1+spf*num_fats)*bps; // +1 for boot sector
-    size_t root_dir_size = sizeof(dir_entry_t) * max_root_dir_entries;
+    //size_t root_dir_size = sizeof(dir_entry_t) * max_root_dir_entries;
     //printf("root_dir_offset: %d\n", root_dir_offset);
     //printf("size of root dir: %d\n", root_dir_size);
 
@@ -124,7 +124,7 @@ void list_files(bsect_t * bsector, uint8_t * img_contents) {
         unsigned char filename[13]; // 8 + '.' + 3 + '\0'
         unsigned char fsize_str[10];
         unsigned char start_cluster_str[10];
-        get_filename(&entry, filename);
+        get_filename(&entry, (char *) filename);
 
         if(filename[0] == '\0') { // no more files in this directory
             break;
@@ -134,11 +134,11 @@ void list_files(bsect_t * bsector, uint8_t * img_contents) {
         }
 
         uint32_t fsize = *((uint32_t *) entry.file_size);
-        sprintf(fsize_str, "%u", fsize);
+        sprintf((char *) fsize_str, "%u", fsize);
         uint16_t start_cluster = *((uint16_t *) entry.start_cluster);
-        sprintf(start_cluster_str, "%u", start_cluster);
-        int fn_len = strlen(filename);
-        int fsize_len = strlen(fsize_str);
+        sprintf((char *) start_cluster_str, "%u", start_cluster);
+        int fn_len = strlen((char *) filename);
+        int fsize_len = strlen((char *) fsize_str);
         if(fn_len > 0) {
             printf("%s", filename);
             for(int j=0; j<15-fn_len; j++) {
@@ -173,14 +173,14 @@ unsigned char * get_file_ptr(bsect_t * bsector, uint8_t * img_contents, dir_entr
 
 dir_entry_t get_file_entry(bsect_t * bsector, uint8_t * img_contents, const char * fname) {
 
-    size_t spc = bsector->sectors_per_cluster;
+    //size_t spc = bsector->sectors_per_cluster;
     size_t bps = *((uint16_t *) bsector->bytes_per_sector);
     size_t spf = *((uint16_t *) bsector->sectors_per_fat);
     size_t num_fats = bsector->num_fats;
     size_t max_root_dir_entries = *((uint16_t *) bsector->max_root_dir_entries);
 
     size_t root_dir_offset = (1+spf*num_fats)*bps; // +1 for boot sector
-    size_t root_dir_size = sizeof(dir_entry_t) * max_root_dir_entries;
+    //size_t root_dir_size = sizeof(dir_entry_t) * max_root_dir_entries;
     uint8_t * root_dir = img_contents + root_dir_offset;
 
     for(size_t i=0; i<max_root_dir_entries; i++) {
