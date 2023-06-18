@@ -38,9 +38,9 @@ int main(int argc, char * argv[]) {
     fat12_list_files(boot_sector, img_contents.data);
 
     if (1) {
-        u8 * file_contents = fat12_get_file_contents(boot_sector, img_contents.data, "README.");
-        printf("===\n%s\n===\n", file_contents);
-        free(file_contents);
+        Buffer file_contents = fat12_get_file_contents(boot_sector, img_contents.data, "README.");
+        printf("===\n%s\n===\n", (char *) file_contents.data);
+        free(file_contents.data);
     }
 
     free(img_contents.data);

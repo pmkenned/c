@@ -59,6 +59,7 @@ read_entire_file(const char * filename)
     if (fstat(fileno(fp), &sb) == -1)
         die(strerror(errno));
     buffer.len = sb.st_size;
+    buffer.cap = sb.st_size;
     buffer.data = malloc(buffer.len);
     int nread = fread(buffer.data, 1, buffer.len, fp);
     if (ferror(fp))

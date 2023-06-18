@@ -38,7 +38,7 @@ typedef struct {
 
 void    fat12_print_fat             (BootSector * bsector, u8 * img_contents);
 void    fat12_list_files            (BootSector * bsector, u8 * img_contents);
-u8 *    fat12_get_file_contents     (BootSector * bsector, u8 * img_contents, const char * fname);
+Buffer  fat12_get_file_contents     (BootSector * bsector, u8 * img_contents, const char * fname);
 //void    fat12_load_sect_from_file   (FILE * fp, size_t sect_num, size_t num_sectors, void * dst);
 
 #endif /* FAT12_H */

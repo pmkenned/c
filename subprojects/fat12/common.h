@@ -16,6 +16,7 @@ typedef int64_t  s64;
 typedef struct {
     void * data;
     size_t len;
+    size_t cap;
 } Buffer;
 
 void die(const char * fmt, ...);

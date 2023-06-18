@@ -229,10 +229,10 @@ get_cluster(BootSector * bsector, u8 * img_contents, u8 * dst, size_t idx, size_
     memcpy(dst, ptr, num_bytes);
 }
 
-// TODO: handle binary files
-u8 *
+Buffer
 fat12_get_file_contents(BootSector * bsector, u8 * img_contents, const char * fname)
 {
+    Buffer file_contents = {0};
     DirEntry entry = get_file_entry(bsector, img_contents, fname);
 
     // get 12-bit entry from FAT
@@ -244,20 +244,22 @@ fat12_get_file_contents(BootSector * bsector, u8 * img_contents, const char * fn
     u16 fat_entry = get_fat12_entry(fat, start_cluster);
 
     u32 fsize = *((u32 *) entry.file_size);
-    u8 * file_contents = malloc(sizeof(*file_contents)*(fsize+1));
+    file_contents.data = malloc(fsize+1);
+    file_contents.cap = fsize+1;
 
     size_t cluster_cnt = 0;
     size_t bytes_remaining = fsize;
     size_t cluster_idx = start_cluster;
     do {
         size_t nbytes = (bpc < bytes_remaining) ? bpc : bytes_remaining;
-        get_cluster(bsector, img_contents, file_contents + bpc*cluster_cnt, cluster_idx, nbytes);
+        get_cluster(bsector, img_contents, file_contents.data + bpc*cluster_cnt, cluster_idx, nbytes);
         bytes_remaining -= bpc;
         fat_entry = get_fat12_entry(fat, fat_entry);
         cluster_idx = fat_entry;
         cluster_cnt++;
     } while (fat_entry != 0xfff);
 
-    file_contents[fsize] = '\0';
+    file_contents.len = fsize;
+    ((u8 *) file_contents.data)[fsize] = '\0';
     return file_contents;
 }
