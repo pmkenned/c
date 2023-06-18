@@ -13,12 +13,14 @@ DEP=$(OBJ:%.o=%.d)
 CFLAGS += -ggdb
 #CFLAGS += -O2 -DNDEBUG
 
+INPUT ?= ./data/borland_turbo_c_v2_disk1.img
+
 .PHONY: all run clean
 
 all: $(BUILD_DIR)/$(TARGET)
 
 run: $(BUILD_DIR)/$(TARGET)
-	$(BUILD_DIR)/$(TARGET)
+	$(BUILD_DIR)/$(TARGET) $(INPUT)
 
 clean:
 	rm -rf $(BUILD_DIR)
